@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details - Bookstore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .btn-back:hover {
+            color: var(--text-primary);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #818cf8, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Form styling */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        input {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            padding: 0.85rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-update {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-update:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-delete {
+            background-color: transparent;
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-delete:hover {
+            background-color: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .not-found {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="/books" class="btn-back">&larr; Back to Collection</a>
+    </header>
+
+    <div class="card" th:if="${book != null}">
+        <h1>Edit Book Details</h1>
+        
+        <!-- Update Form -->
+        <form th:action="@{/books/{id}(id=${book.id})}" th:method="PUT">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" th:value="${book.title}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" name="author" th:value="${book.author}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input type="number" id="price" name="price" step="0.01" min="0" th:value="${book.price}" required>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn-update">Update Details</button>
+                <!-- Delete Button triggers a separate form submit or we can use a separate form -->
+                <button type="button" class="btn-delete" onclick="document.getElementById('delete-form').submit();">Delete Book</button>
+            </div>
+        </form>
+
+        <!-- Hidden Delete Form -->
+        <form id="delete-form" th:action="@{/books/{id}(id=${book.id})}" th:method="DELETE" style="display: none;">
+        </form>
+    </div>
+
+    <div class="card not-found" th:if="${book == null}">
+        <h1>Book Not Found</h1>
+        <p>The requested book could not be found in the system.</p>
+        <br>
+        <a href="/books" class="btn-update" style="display: inline-block; text-decoration: none; text-align: center;">Return Home</a>
+    </div>
+</div>
+
+</body>
+</html>
